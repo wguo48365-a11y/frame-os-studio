@@ -69,7 +69,7 @@ export function HomeWorkspace() {
           <div className="ai-spark">✦</div>
           <div className="search-content">
             <label htmlFor="creative-search">告诉 FRAME AI 你正在创作什么</label>
-            <textarea id="creative-search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="例如：一首关于等待的粤语女声 MV，孤独、冷峻、电影感。现代建筑空间，不要广告感……" />
+            <textarea id="creative-search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="例如：孤独人物置身现代建筑，冷峻、克制、电影感。强调空间秩序，不要广告感……" />
             <div className="search-footer">
               <div className="chips">
                 {["孤独女性", "现代建筑", "冷银色调", "慢推镜头"].map((tag) => <button key={tag} onClick={() => toggle(tag)} className={selected.includes(tag) ? "selected" : ""}>{tag}</button>)}
@@ -104,7 +104,7 @@ export function HomeWorkspace() {
           <div className="section-head"><div><p className="eyebrow gold">ACTIVE PROJECTS</p><h2>继续你的项目</h2></div><a href={url("/moodboard/")}>查看全部 3 个项目 →</a></div>
           <a className="project-card" href={url("/moodboard/")}>
             <div className="project-collage"><img src={url("/frame-window.png")} alt="雨夜窗边女性" /><img src={url("/frame-stage.png")} alt="暖光舞台女性" /></div>
-            <div className="project-info"><p>MV · IN PROGRESS</p><h3>《一生何求》</h3><span>粤语女声 / 等待与错过</span><div className="progress"><i style={{ width: "68%" }} /><small>68% 视觉开发</small></div></div>
+            <div className="project-info"><p>VISUAL STUDY · IN PROGRESS</p><h3>静默建筑</h3><span>空间 / 人物 / 光的距离</span><div className="progress"><i style={{ width: "68%" }} /><small>68% 视觉开发</small></div></div>
             <div className="project-stat"><b>24</b><span>REFERENCES</span><i>→</i></div>
           </a>
         </section>
@@ -123,7 +123,7 @@ export function AnalysisPage() {
     <Shell active="/analysis">
       <div className="page analysis-page">
         <div className="breadcrumb"><a href={url("/")}>静帧库</a><span>/</span><b>夜窗独白</b></div>
-        <section className="analysis-title"><div><p className="eyebrow gold">FRAME ANALYSIS · 0178</p><h1>夜窗独白</h1><p>来自项目《一生何求》 · Chapter 02</p></div><div className="analysis-actions"><button>♡ 收藏</button><button>＋ 加入项目</button><button>•••</button></div></section>
+        <section className="analysis-title"><div><p className="eyebrow gold">FRAME ANALYSIS · 0178</p><h1>夜窗独白</h1><p>来自视觉研究「静默建筑」 · Chapter 02</p></div><div className="analysis-actions"><button>♡ 收藏</button><button>＋ 加入项目</button><button>•••</button></div></section>
         <section className="analysis-hero">
           <div className="analysis-image"><img src={url("/frame-window.png")} alt="雨夜窗边女性的电影静帧" /><span className="ratio">2.39 : 1</span><span className="focus-dot" /></div>
           <div className="score-panel"><p>REAL CINEMA SCORE</p><div className="score-ring"><b>92</b><span>/ 100</span></div><h3>高真实电影感</h3><p>自然肤质、克制光比与非对称构图共同降低 AI 感。</p><div className="risk-row"><span>塑料肤质</span><i><b style={{ width: "12%" }} /></i><em>低</em></div><div className="risk-row"><span>过度锐化</span><i><b style={{ width: "18%" }} /></i><em>低</em></div><div className="risk-row"><span>棚拍广告感</span><i><b style={{ width: "26%" }} /></i><em>低</em></div></div>
@@ -155,8 +155,8 @@ export function MoodboardPage() {
   return (
     <Shell active="/moodboard">
       <div className="page mood-page">
-        <div className="breadcrumb"><a href={url("/")}>项目</a><span>/</span><b>一生何求</b></div>
-        <section className="mood-title"><div><p className="eyebrow gold">MV · VISUAL DEVELOPMENT</p><h1>《一生何求》</h1><p>粤语女声 · 等待、错过与最终的释然</p></div><div className="mood-actions"><div className="member-stack"><span>KD</span><span>AI</span></div><button>分享</button><button className="export-btn">导出导演板</button></div></section>
+        <div className="breadcrumb"><a href={url("/")}>项目</a><span>/</span><b>静默建筑</b></div>
+        <section className="mood-title"><div><p className="eyebrow gold">VISUAL STUDY · PROJECT 01</p><h1>静默建筑</h1><p>关于空间、人物与光的距离研究</p></div><div className="mood-actions"><div className="member-stack"><span>KD</span><span>AI</span></div><button>分享</button><button className="export-btn">导出导演板</button></div></section>
         <div className="mood-layout">
           <aside className="chapter-nav"><div className="chapter-head"><p className="eyebrow">CHAPTERS</p><button>＋</button></div>{chapters.map((item, i) => <button key={item.no} onClick={() => change(i)} className={chapter === i ? "active" : ""}><span>{item.no}</span><div><b>{item.title}</b><small>{item.emotion}</small></div><i>{chapter === i ? "●" : "○"}</i></button>)}<div className="project-progress"><div><span>视觉开发进度</span><b>68%</b></div><i><b /></i><small>24 张参考 · 3 个章节</small></div></aside>
           <section className="director-board">

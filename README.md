@@ -6,7 +6,7 @@
 
 - `/`：AI 灵感搜索、今日精选与项目入口
 - `/analysis/`：构图、光影、色彩、镜头语言与 Seedance 提示词
-- `/moodboard/`：《一生何求》MV 章节式导演 Moodboard
+- `/moodboard/`：「静默建筑」章节式视觉研究 Moodboard
 
 ## 本地运行
 

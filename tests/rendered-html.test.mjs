@@ -19,7 +19,7 @@ test("exports every FRAME OS route", async () => {
   assert.match(home, /今日视觉主题/);
   assert.match(analysis, /静帧分析/);
   assert.match(analysis, /Seedance/);
-  assert.match(moodboard, /一生何求/);
+  assert.match(moodboard, /静默建筑/);
   assert.match(moodboard, /DIRECTOR(?:'|&#x27;)S NOTE/);
   assert.doesNotMatch(home + analysis + moodboard, /chatgpt\.site/);
 });
