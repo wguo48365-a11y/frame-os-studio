@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const url = (path: string) => `${basePath}${path}`;
+
 const nav = [
   { href: "/", label: "视觉工作台", icon: "⌂" },
   { href: "/analysis", label: "静帧分析", icon: "◎" },
@@ -12,14 +15,14 @@ function Shell({ active, children }: { active: string; children: React.ReactNode
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <a href="/" className="brand" aria-label="FRAME OS 首页">
+        <a href={url("/")} className="brand" aria-label="FRAME OS 首页">
           <span className="brand-mark">F</span>
           <span><b>FRAME</b><small>OS / 镜库</small></span>
         </a>
         <nav className="side-nav" aria-label="主导航">
           <p className="eyebrow">WORKSPACE</p>
           {nav.map((item) => (
-            <a key={item.href} href={item.href} className={active === item.href ? "active" : ""}>
+            <a key={item.href} href={url(item.href)} className={active === item.href ? "active" : ""}>
               <span>{item.icon}</span>{item.label}
             </a>
           ))}
@@ -75,12 +78,12 @@ export function HomeWorkspace() {
             </div>
           </div>
         </section>
-        {searched && <div className="ai-result"><span>✦</span><b>已生成视觉方向：</b>冷银建筑秩序 × 女性孤独感 × 35mm 微弱手持慢推 <a href="/analysis">进入完整分析 →</a></div>}
+        {searched && <div className="ai-result"><span>✦</span><b>已生成视觉方向：</b>冷银建筑秩序 × 女性孤独感 × 35mm 微弱手持慢推 <a href={url("/analysis/")}>进入完整分析 →</a></div>}
 
         <section className="section-head"><div><p className="eyebrow gold">DAILY CURATION</p><h2>今日视觉主题</h2></div><div className="theme-meta"><span>NO. 084</span><span>4 FRAMES</span></div></section>
         <section className="hero-frame">
-          <a href="/analysis" className="hero-image">
-            <img src="/frame-hall.png" alt="女性走在冷银色现代建筑大厅中的电影静帧" />
+          <a href={url("/analysis/")} className="hero-image">
+            <img src={url("/frame-hall.png")} alt="女性走在冷银色现代建筑大厅中的电影静帧" />
             <div className="frame-index">FRAME 01 / 04</div>
             <div className="hero-overlay"><p>VISUAL THEME · 084</p><h3>空旷之中，<br />人的尺度。</h3><div><span>孤独女性</span><span>建筑秩序</span><span>冷银色调</span></div></div>
             <span className="analyze-link">分析此静帧 ↗</span>
@@ -93,14 +96,14 @@ export function HomeWorkspace() {
               <li><b>02</b><span><strong>克制的色彩关系</strong><small>冷银灰为主，仅保留一处暖金呼吸点。</small></span></li>
               <li><b>03</b><span><strong>精确但不僵硬</strong><small>对称秩序被人物步态轻微打破。</small></span></li>
             </ol>
-            <a href="/analysis">查看完整视觉分析 <span>→</span></a>
+            <a href={url("/analysis/")}>查看完整视觉分析 <span>→</span></a>
           </aside>
         </section>
 
         <section className="project-section">
-          <div className="section-head"><div><p className="eyebrow gold">ACTIVE PROJECTS</p><h2>继续你的项目</h2></div><a href="/moodboard">查看全部 3 个项目 →</a></div>
-          <a className="project-card" href="/moodboard">
-            <div className="project-collage"><img src="/frame-window.png" alt="雨夜窗边女性" /><img src="/frame-stage.png" alt="暖光舞台女性" /></div>
+          <div className="section-head"><div><p className="eyebrow gold">ACTIVE PROJECTS</p><h2>继续你的项目</h2></div><a href={url("/moodboard/")}>查看全部 3 个项目 →</a></div>
+          <a className="project-card" href={url("/moodboard/")}>
+            <div className="project-collage"><img src={url("/frame-window.png")} alt="雨夜窗边女性" /><img src={url("/frame-stage.png")} alt="暖光舞台女性" /></div>
             <div className="project-info"><p>MV · IN PROGRESS</p><h3>《一生何求》</h3><span>粤语女声 / 等待与错过</span><div className="progress"><i style={{ width: "68%" }} /><small>68% 视觉开发</small></div></div>
             <div className="project-stat"><b>24</b><span>REFERENCES</span><i>→</i></div>
           </a>
@@ -119,10 +122,10 @@ export function AnalysisPage() {
   return (
     <Shell active="/analysis">
       <div className="page analysis-page">
-        <div className="breadcrumb"><a href="/">静帧库</a><span>/</span><b>夜窗独白</b></div>
+        <div className="breadcrumb"><a href={url("/")}>静帧库</a><span>/</span><b>夜窗独白</b></div>
         <section className="analysis-title"><div><p className="eyebrow gold">FRAME ANALYSIS · 0178</p><h1>夜窗独白</h1><p>来自项目《一生何求》 · Chapter 02</p></div><div className="analysis-actions"><button>♡ 收藏</button><button>＋ 加入项目</button><button>•••</button></div></section>
         <section className="analysis-hero">
-          <div className="analysis-image"><img src="/frame-window.png" alt="雨夜窗边女性的电影静帧" /><span className="ratio">2.39 : 1</span><span className="focus-dot" /></div>
+          <div className="analysis-image"><img src={url("/frame-window.png")} alt="雨夜窗边女性的电影静帧" /><span className="ratio">2.39 : 1</span><span className="focus-dot" /></div>
           <div className="score-panel"><p>REAL CINEMA SCORE</p><div className="score-ring"><b>92</b><span>/ 100</span></div><h3>高真实电影感</h3><p>自然肤质、克制光比与非对称构图共同降低 AI 感。</p><div className="risk-row"><span>塑料肤质</span><i><b style={{ width: "12%" }} /></i><em>低</em></div><div className="risk-row"><span>过度锐化</span><i><b style={{ width: "18%" }} /></i><em>低</em></div><div className="risk-row"><span>棚拍广告感</span><i><b style={{ width: "26%" }} /></i><em>低</em></div></div>
         </section>
         <div className="analysis-tabs">{["视觉拆解", "镜头语言", "Seedance 提示词"].map((t) => <button key={t} onClick={() => setTab(t)} className={tab === t ? "active" : ""}>{t}</button>)}</div>
@@ -152,17 +155,17 @@ export function MoodboardPage() {
   return (
     <Shell active="/moodboard">
       <div className="page mood-page">
-        <div className="breadcrumb"><a href="/">项目</a><span>/</span><b>一生何求</b></div>
+        <div className="breadcrumb"><a href={url("/")}>项目</a><span>/</span><b>一生何求</b></div>
         <section className="mood-title"><div><p className="eyebrow gold">MV · VISUAL DEVELOPMENT</p><h1>《一生何求》</h1><p>粤语女声 · 等待、错过与最终的释然</p></div><div className="mood-actions"><div className="member-stack"><span>KD</span><span>AI</span></div><button>分享</button><button className="export-btn">导出导演板</button></div></section>
         <div className="mood-layout">
           <aside className="chapter-nav"><div className="chapter-head"><p className="eyebrow">CHAPTERS</p><button>＋</button></div>{chapters.map((item, i) => <button key={item.no} onClick={() => change(i)} className={chapter === i ? "active" : ""}><span>{item.no}</span><div><b>{item.title}</b><small>{item.emotion}</small></div><i>{chapter === i ? "●" : "○"}</i></button>)}<div className="project-progress"><div><span>视觉开发进度</span><b>68%</b></div><i><b /></i><small>24 张参考 · 3 个章节</small></div></aside>
           <section className="director-board">
             <header className="board-head"><div><span>CHAPTER {c.no}</span><h2>{c.title}</h2></div><div className="chapter-data"><span><small>EMOTION</small>{c.emotion}</span><span><small>COLOR</small>{c.color}</span><span><small>CAMERA</small>{c.camera}</span></div></header>
             <div className="board-grid">
-              <article className="board-card hero-ref"><div className="card-label"><span>01</span>主视觉 / HERO FRAME</div><img src={chapter === 2 ? "/frame-stage.png" : chapter === 1 ? "/frame-window.png" : "/frame-hall.png"} alt="章节主视觉参考" /><button>↗ 分析</button></article>
-              <article className="board-card space-ref"><div className="card-label"><span>02</span>空间 / SPACE</div><img src="/frame-concrete.png" alt="混凝土空间参考" /></article>
-              <article className="board-card light-ref"><div className="card-label"><span>03</span>光影 / LIGHT</div><img src="/frame-stage.png" alt="琥珀舞台光影参考" /></article>
-              <article className="board-card texture-ref"><div className="card-label"><span>04</span>材质 / TEXTURE</div><img src="/frame-texture.png" alt="金属与丝绸材质参考" /></article>
+              <article className="board-card hero-ref"><div className="card-label"><span>01</span>主视觉 / HERO FRAME</div><img src={url(chapter === 2 ? "/frame-stage.png" : chapter === 1 ? "/frame-window.png" : "/frame-hall.png")} alt="章节主视觉参考" /><button>↗ 分析</button></article>
+              <article className="board-card space-ref"><div className="card-label"><span>02</span>空间 / SPACE</div><img src={url("/frame-concrete.png")} alt="混凝土空间参考" /></article>
+              <article className="board-card light-ref"><div className="card-label"><span>03</span>光影 / LIGHT</div><img src={url("/frame-stage.png")} alt="琥珀舞台光影参考" /></article>
+              <article className="board-card texture-ref"><div className="card-label"><span>04</span>材质 / TEXTURE</div><img src={url("/frame-texture.png")} alt="金属与丝绸材质参考" /></article>
               <article className="color-card"><div className="card-label"><span>05</span>色板 / PALETTE</div><div className="color-strips"><span style={{ background: "#d9d8d2" }}><b>冷白</b><small>#D9D8D2</small></span><span style={{ background: "#889196" }}><b>银灰</b><small>#889196</small></span><span style={{ background: "#273137" }}><b>石墨</b><small>#273137</small></span><span style={{ background: "#9b6a32" }}><b>余温</b><small>#9B6A32</small></span></div></article>
               <article className="notes-card"><div className="card-label"><span>06</span>导演备注 / DIRECTOR'S NOTE</div><textarea value={note} onChange={(e) => setNote(e.target.value)} aria-label="导演备注" /><footer><span>已自动保存</span><button>＋ 添加标注</button></footer></article>
             </div>
