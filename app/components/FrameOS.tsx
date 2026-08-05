@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { curatedFrames, curationDate } from "../data/curation";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const url = (path: string) => `${basePath}${path}`;
@@ -12,6 +13,7 @@ const nav = [
 ];
 
 function Shell({ active, children }: { active: string; children: React.ReactNode }) {
+  const archiveTotal = 248 + curatedFrames.length;
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -29,9 +31,9 @@ function Shell({ active, children }: { active: string; children: React.ReactNode
         </nav>
         <div className="side-library">
           <p className="eyebrow">LIBRARY</p>
-          <button><span className="dot silver" />全部静帧 <em>248</em></button>
-          <button><span className="dot amber" />收藏 <em>36</em></button>
-          <button><span className="dot slate" />待整理 <em>12</em></button>
+          <button><span className="dot silver" />全部静帧 <em>{archiveTotal}</em></button>
+          <button><span className="dot amber" />今日新增 <em>{curatedFrames.length}</em></button>
+          <button><span className="dot slate" />授权清晰 <em>100%</em></button>
         </div>
         <div className="profile">
           <span className="avatar">KD</span>
@@ -55,14 +57,17 @@ export function HomeWorkspace() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState(["孤独女性", "现代建筑"]);
   const [searched, setSearched] = useState(false);
+  const [curationFilter, setCurationFilter] = useState("全部");
   const toggle = (tag: string) => setSelected((s) => s.includes(tag) ? s.filter((x) => x !== tag) : [...s, tag]);
+  const categories = ["全部", ...Array.from(new Set(curatedFrames.map((frame) => frame.category)))];
+  const visibleFrames = curationFilter === "全部" ? curatedFrames : curatedFrames.filter((frame) => frame.category === curationFilter);
 
   return (
     <Shell active="/">
       <div className="page home-page">
         <section className="welcome-row">
-          <div><p className="eyebrow gold">TUESDAY · 04 AUG</p><h1>早上好，导演。</h1><p>今天要创造怎样的画面？</p></div>
-          <div className="archive-count"><b>248</b><span>FRAMES<br />ARCHIVED</span></div>
+          <div><p className="eyebrow gold">WEDNESDAY · 05 AUG</p><h1>早上好，导演。</h1><p>今天要创造怎样的画面？</p></div>
+          <div className="archive-count"><b>{248 + curatedFrames.length}</b><span>FRAMES<br />ARCHIVED</span></div>
         </section>
 
         <section className="ai-search-panel">
@@ -98,6 +103,32 @@ export function HomeWorkspace() {
             </ol>
             <a href={url("/analysis/")}>查看完整视觉分析 <span>→</span></a>
           </aside>
+        </section>
+
+        <section className="intake-section" aria-labelledby="intake-title">
+          <div className="section-head intake-head">
+            <div><p className="eyebrow gold">TODAY&apos;S INTAKE · {curationDate}</p><h2 id="intake-title">今日入库</h2><p className="section-description">每日从授权清晰的公开来源中筛选，按创作者工作流归档。</p></div>
+            <div className="theme-meta"><span>{curatedFrames.length} NEW FRAMES</span><span>{categories.length - 1} CATEGORIES</span></div>
+          </div>
+          <div className="curation-filters" aria-label="静帧类别">
+            {categories.map((category) => <button key={category} aria-pressed={curationFilter === category} onClick={() => setCurationFilter(category)} className={curationFilter === category ? "active" : ""}>{category}</button>)}
+          </div>
+          <div className="curation-grid">
+            {visibleFrames.map((frame, index) => (
+              <article className="curation-card" key={frame.id}>
+                <a className="curation-image" href={frame.sourceUrl} target="_blank" rel="noreferrer">
+                  <img src={url(frame.image)} alt={frame.title} />
+                  <span className="curation-index">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="curation-category">{frame.category}</span>
+                </a>
+                <div className="curation-info">
+                  <div><h3>{frame.title}</h3><p>{frame.mood}</p></div>
+                  <div className="curation-tags">{frame.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+                  <footer><span>PHOTO · {frame.author}</span><span><a href={frame.sourceUrl} target="_blank" rel="noreferrer">来源 ↗</a><a href={frame.licenseUrl} target="_blank" rel="noreferrer">{frame.license}</a></span></footer>
+                </div>
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className="project-section">
@@ -167,7 +198,7 @@ export function MoodboardPage() {
               <article className="board-card light-ref"><div className="card-label"><span>03</span>光影 / LIGHT</div><img src={url("/frame-stage.png")} alt="琥珀舞台光影参考" /></article>
               <article className="board-card texture-ref"><div className="card-label"><span>04</span>材质 / TEXTURE</div><img src={url("/frame-texture.png")} alt="金属与丝绸材质参考" /></article>
               <article className="color-card"><div className="card-label"><span>05</span>色板 / PALETTE</div><div className="color-strips"><span style={{ background: "#d9d8d2" }}><b>冷白</b><small>#D9D8D2</small></span><span style={{ background: "#889196" }}><b>银灰</b><small>#889196</small></span><span style={{ background: "#273137" }}><b>石墨</b><small>#273137</small></span><span style={{ background: "#9b6a32" }}><b>余温</b><small>#9B6A32</small></span></div></article>
-              <article className="notes-card"><div className="card-label"><span>06</span>导演备注 / DIRECTOR'S NOTE</div><textarea value={note} onChange={(e) => setNote(e.target.value)} aria-label="导演备注" /><footer><span>已自动保存</span><button>＋ 添加标注</button></footer></article>
+              <article className="notes-card"><div className="card-label"><span>06</span>导演备注 / DIRECTOR&apos;S NOTE</div><textarea value={note} onChange={(e) => setNote(e.target.value)} aria-label="导演备注" /><footer><span>已自动保存</span><button>＋ 添加标注</button></footer></article>
             </div>
           </section>
         </div>
