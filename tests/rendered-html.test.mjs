@@ -18,8 +18,11 @@ test("exports every FRAME OS route", async () => {
   assert.match(home, /FRAME OS/);
   assert.match(home, /今日视觉主题/);
   assert.match(home, /今日入库/);
-  assert.match(home, /粗野主义地平线/);
+  assert.match(home, /混凝土缎带/);
+  assert.match(home, /2026-08-06/);
   assert.match(home, /CC BY-SA 4\.0/);
+  assert.doesNotMatch(home, /粗野主义地平线/);
+  assert.equal((home.match(/curation-card/g) ?? []).length, 8);
   assert.match(analysis, /静帧分析/);
   assert.match(analysis, /Seedance/);
   assert.match(moodboard, /静默建筑/);
@@ -43,5 +46,13 @@ test("exports all cinematic assets", async () => {
     "curation/2026-08-05/golden-ditch.jpg",
     "curation/2026-08-05/fluted-color.jpg",
     "curation/2026-08-05/white-ribbon.jpg",
+    "curation/2026-08-06/concrete-ribbon.jpg",
+    "curation/2026-08-06/perseid-mirror.jpg",
+    "curation/2026-08-06/needle-eye.jpg",
+    "curation/2026-08-06/arid-delta.jpg",
+    "curation/2026-08-06/machine-dials.jpg",
+    "curation/2026-08-06/street-void.jpg",
+    "curation/2026-08-06/slate-copper.jpg",
+    "curation/2026-08-06/spike-shadow.jpg",
   ].map((name) => access(new URL(name, root))));
 });

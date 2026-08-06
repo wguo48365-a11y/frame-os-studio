@@ -5,6 +5,7 @@ import { curatedFrames, curationDate } from "../data/curation";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const url = (path: string) => `${basePath}${path}`;
+const dailyFrames = curatedFrames.filter((frame) => frame.date === curationDate);
 
 const nav = [
   { href: "/", label: "视觉工作台", icon: "⌂" },
@@ -32,7 +33,7 @@ function Shell({ active, children }: { active: string; children: React.ReactNode
         <div className="side-library">
           <p className="eyebrow">LIBRARY</p>
           <button><span className="dot silver" />全部静帧 <em>{archiveTotal}</em></button>
-          <button><span className="dot amber" />今日新增 <em>{curatedFrames.length}</em></button>
+          <button><span className="dot amber" />今日新增 <em>{dailyFrames.length}</em></button>
           <button><span className="dot slate" />授权清晰 <em>100%</em></button>
         </div>
         <div className="profile">
@@ -59,14 +60,14 @@ export function HomeWorkspace() {
   const [searched, setSearched] = useState(false);
   const [curationFilter, setCurationFilter] = useState("全部");
   const toggle = (tag: string) => setSelected((s) => s.includes(tag) ? s.filter((x) => x !== tag) : [...s, tag]);
-  const categories = ["全部", ...Array.from(new Set(curatedFrames.map((frame) => frame.category)))];
-  const visibleFrames = curationFilter === "全部" ? curatedFrames : curatedFrames.filter((frame) => frame.category === curationFilter);
+  const categories = ["全部", ...Array.from(new Set(dailyFrames.map((frame) => frame.category)))];
+  const visibleFrames = curationFilter === "全部" ? dailyFrames : dailyFrames.filter((frame) => frame.category === curationFilter);
 
   return (
     <Shell active="/">
       <div className="page home-page">
         <section className="welcome-row">
-          <div><p className="eyebrow gold">WEDNESDAY · 05 AUG</p><h1>早上好，导演。</h1><p>今天要创造怎样的画面？</p></div>
+          <div><p className="eyebrow gold">THURSDAY · 06 AUG</p><h1>早上好，导演。</h1><p>今天要创造怎样的画面？</p></div>
           <div className="archive-count"><b>{248 + curatedFrames.length}</b><span>FRAMES<br />ARCHIVED</span></div>
         </section>
 
@@ -108,7 +109,7 @@ export function HomeWorkspace() {
         <section className="intake-section" aria-labelledby="intake-title">
           <div className="section-head intake-head">
             <div><p className="eyebrow gold">TODAY&apos;S INTAKE · {curationDate}</p><h2 id="intake-title">今日入库</h2><p className="section-description">每日从授权清晰的公开来源中筛选，按创作者工作流归档。</p></div>
-            <div className="theme-meta"><span>{curatedFrames.length} NEW FRAMES</span><span>{categories.length - 1} CATEGORIES</span></div>
+            <div className="theme-meta"><span>{dailyFrames.length} NEW FRAMES</span><span>{categories.length - 1} CATEGORIES</span></div>
           </div>
           <div className="curation-filters" aria-label="静帧类别">
             {categories.map((category) => <button key={category} aria-pressed={curationFilter === category} onClick={() => setCurationFilter(category)} className={curationFilter === category ? "active" : ""}>{category}</button>)}
