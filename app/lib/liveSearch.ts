@@ -55,7 +55,7 @@ const conciseTerms: Record<string, string> = {
   "woman female portrait": "woman",
   "man male portrait": "man",
   "cinematic portrait": "portrait",
-  "modern architecture interior": "modern architecture",
+  "modern architecture interior": "architecture",
   "brutalist concrete architecture": "brutalist concrete",
   "futuristic science fiction": "futuristic",
   "minimal negative space": "minimal negative space",
@@ -81,16 +81,24 @@ const conciseTerms: Record<string, string> = {
   "surreal dreamlike": "surreal",
 };
 
-export function translateCreativeQuery(query: string, selected: string[] = []) {
-  const input = `${query} ${selected.join(" ")}`.trim();
+function collectVisualTerms(input: string) {
   const terms: string[] = [];
   for (const [pattern, translation] of visualLexicon) {
     pattern.lastIndex = 0;
     if (pattern.test(input)) terms.push(conciseTerms[translation] ?? translation);
   }
-  const englishWords = input.match(/[a-zA-Z][a-zA-Z\s-]{2,}/g)?.join(" ").trim();
+  const englishWords = input.match(/\b[a-zA-Z][a-zA-Z-]*\b/g)?.slice(0, 8).join(" ");
   if (englishWords) terms.unshift(englishWords);
-  return Array.from(new Set(terms)).slice(0, 5).join(" ") || input || englishFallback;
+  return terms;
+}
+
+export function translateCreativeQuery(query: string, selected: string[] = []) {
+  const typedQuery = query.trim();
+  const terms = [
+    ...collectVisualTerms(typedQuery),
+    ...collectVisualTerms(selected.join(" ")),
+  ];
+  return Array.from(new Set(terms)).slice(0, 5).join(" ") || typedQuery || englishFallback;
 }
 
 function safeText(value: unknown, fallback: string) {
