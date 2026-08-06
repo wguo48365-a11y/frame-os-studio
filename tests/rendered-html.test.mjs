@@ -18,9 +18,9 @@ test("exports every FRAME OS route", async () => {
   assert.match(home, /FRAME OS/);
   assert.match(home, /今日视觉主题/);
   assert.match(home, /今日入库/);
-  assert.match(home, /LIVE SEARCH READY/);
-  assert.match(home, /WIKIMEDIA COMMONS/);
-  assert.match(home, /OPENVERSE/);
+  assert.match(home, /QUALITY GATE ACTIVE/);
+  assert.match(home, /VIMEO STAFF PICKS/);
+  assert.match(home, /NO AUTO-FILL/);
   assert.match(home, /联网寻找参考/);
   assert.match(home, /时尚型 MV/);
   assert.match(home, /混凝土缎带/);
@@ -43,6 +43,16 @@ test("exports all cinematic assets", async () => {
     "frame-stage.png",
     "frame-texture.png",
     "og.png",
+    "professional/mv/beside-april.jpg",
+    "professional/mv/xena.jpg",
+    "professional/mv/ocha.jpg",
+    "professional/mv/territory.jpg",
+    "professional/mv/arcadian.jpg",
+    "professional/mv/mira-mira.jpg",
+    "professional/mv/another-night-out.jpg",
+    "professional/mv/growing-young.jpg",
+    "professional/mv/nobody-speak.jpg",
+    "professional/mv/tailor-swif.jpg",
     "curation/2026-08-05/brutalist-horizon.jpg",
     "curation/2026-08-05/window-contrast.jpg",
     "curation/2026-08-05/blue-stage.jpg",
@@ -60,4 +70,16 @@ test("exports all cinematic assets", async () => {
     "curation/2026-08-06/slate-copper.jpg",
     "curation/2026-08-06/spike-shadow.jpg",
   ].map((name) => access(new URL(name, root))));
+});
+
+test("uses the professional quality index instead of open archive auto-fill", async () => {
+  const [works, search] = await Promise.all([
+    readFile(new URL("../app/data/professionalWorks.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/lib/liveSearch.ts", import.meta.url), "utf8"),
+  ]);
+
+  assert.equal((works.match(/id: "vimeo-/g) ?? []).length, 10);
+  assert.match(works, /VIMEO STAFF PICK/);
+  assert.match(search, /乐队/);
+  assert.doesNotMatch(search, /api\.openverse\.org|api\.artic\.edu|commons\.wikimedia\.org\/w\/api/);
 });

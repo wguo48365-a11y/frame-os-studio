@@ -75,10 +75,8 @@ export function HomeWorkspace() {
     setSearchStatus("loading");
     setSearchResults([]);
     setSearchDirections([]);
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 18000);
     try {
-      const response = await searchLiveFrames(requestedQuery, selected, controller.signal);
+      const response = await searchLiveFrames(requestedQuery, selected);
       setSearchResults(response.results);
       setSearchTerm(response.translatedQuery);
       setIntentLabel(response.intentLabel);
@@ -90,8 +88,6 @@ export function HomeWorkspace() {
       setIntentLabel("联网参考");
       setActiveSources([]);
       setSearchStatus("error");
-    } finally {
-      window.clearTimeout(timeout);
     }
   };
 
@@ -110,25 +106,25 @@ export function HomeWorkspace() {
             <textarea id="creative-search" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") void runSearch(); }} placeholder="例如：时尚型 MV，女性独舞，红色舞台，强轮廓光，克制而有力量……" />
             <div className="search-footer">
               <div className="chips">
-                {["时尚造型", "舞台表演", "叙事电影", "实验影像"].map((tag) => <button type="button" key={tag} onClick={() => toggle(tag)} className={selected.includes(tag) ? "selected" : ""}>{tag}</button>)}
+                {["MV · 时尚造型", "MV · 舞台表演", "MV · 叙事电影", "MV · 实验影像"].map((tag) => <button type="button" key={tag} onClick={() => toggle(tag)} className={selected.includes(tag) ? "selected" : ""}>{tag}</button>)}
               </div>
               <button type="button" className="generate-btn" onClick={() => void runSearch()} disabled={searchStatus === "loading"}>{searchStatus === "loading" ? "正在检索网络…" : "联网寻找参考"} <span>→</span></button>
             </div>
           </div>
         </section>
-        <div className="network-source-strip"><span><i /> LIVE SEARCH READY</span><b>WIKIMEDIA COMMONS · FILM &amp; MEDIA</b><b>OPENVERSE · OPEN WORKS</b><em>Ctrl / ⌘ + Enter</em></div>
+        <div className="network-source-strip"><span><i /> QUALITY GATE ACTIVE</span><b>VIMEO STAFF PICKS / AWARDS</b><b>FRAME OS · HUMAN CURATION</b><em>NO AUTO-FILL · Ctrl / ⌘ + Enter</em></div>
 
         {searchStatus !== "idle" && <section className={`network-results ${searchStatus}`} aria-live="polite" aria-busy={searchStatus === "loading"}>
           <header className="network-results-head">
             <div><p className="eyebrow gold">NETWORK VISUAL RESEARCH</p><h2>{searchStatus === "loading" ? "正在穿过视觉网络…" : intentLabel}</h2></div>
-            {searchStatus === "ready" && <div className="network-stats"><span>{searchResults.length} RESULTS</span><span>{activeSources.length} LIVE SOURCES</span></div>}
+            {searchStatus === "ready" && <div className="network-stats"><span>{searchResults.length} EDITOR PICKS</span><span>{activeSources.length} VERIFIED SOURCE</span></div>}
           </header>
-          {searchStatus === "loading" && <div className="network-loading"><i /><i /><i /><p>正在跨来源检索、去重并整理出处。</p></div>}
+          {searchStatus === "loading" && <div className="network-loading"><i /><i /><i /><p>正在检索通过质量门槛的专业作品索引。</p></div>}
           {searchStatus === "error" && <div className="network-error"><b>实时来源暂时没有响应。</b><span>你仍可使用下方专业站点深度检索；稍后也可以再次点击联网搜索。</span></div>}
           {(searchStatus === "ready" || searchStatus === "error") && <>
             <div className="search-interpretation"><span>FRAME OS 理解的视觉意图</span><b>{searchTerm}</b></div>
             {searchDirections.length > 0 && <div className="intent-directions">
-              <div><p className="eyebrow">CHOOSE A DIRECTION</p><h3>“MV”范围很大，继续收窄方向</h3><p>下面的结果已按四类 MV 语言检索；选择一个方向可获得更准确的下一轮参考。</p></div>
+              <div><p className="eyebrow">CHOOSE A DIRECTION</p><h3>从专业作品继续收窄方向</h3><p>结果只来自人工筛选的 Staff Pick、奖项入选与专业制作；选择方向可重新排序。</p></div>
               <div>{searchDirections.map((direction) => <button type="button" key={direction.id} onClick={() => void runSearch(direction.query)}>
                 <img src={url(direction.image)} alt="" />
                 <span><b>{direction.title}</b><small>{direction.subtitle}</small></span><i>→</i>
@@ -139,7 +135,7 @@ export function HomeWorkspace() {
               <div>{professionalSources.map((source) => <a key={source.name} href={professionalSearchUrl(source.domain, query, selected)} target="_blank" rel="noreferrer"><span>{source.name}</span><small>{source.type}</small><i>↗</i></a>)}</div>
             </div>
           </>}
-          {searchStatus === "ready" && searchResults.length === 0 && <div className="network-error"><b>当前关键词没有直接结果。</b><span>尝试减少限制词，或从专业站点继续检索。</span></div>}
+          {searchStatus === "ready" && searchResults.length === 0 && <div className="network-error"><b>专业索引中暂时没有通过质量门槛的结果。</b><span>FRAME OS 不会用低质图片补位；请从上方专业站点继续深搜。</span></div>}
           {searchStatus === "ready" && searchResults.length > 0 && <div className="network-grid">
             {searchResults.map((frame, index) => <article className="network-card" key={frame.id}>
               <a href={frame.sourceUrl} target="_blank" rel="noreferrer" className="network-image">
@@ -147,6 +143,7 @@ export function HomeWorkspace() {
                 <span className="image-fallback">预览暂不可用 · 查看原站</span>
                 <span className="network-index">{String(index + 1).padStart(2, "0")}</span><b>{frame.source}</b>
                 {frame.direction && <em>{frame.direction}</em>}
+                {frame.mediaType && <span className="media-type">{frame.mediaType === "video" ? "▶ VIDEO" : "FRAME"}{frame.duration ? ` · ${frame.duration}` : ""}</span>}
               </a>
               <div><h3>{frame.title}</h3><p>{frame.creator}</p><footer><a href={frame.licenseUrl} target="_blank" rel="noreferrer">{frame.license}</a><a href={frame.sourceUrl} target="_blank" rel="noreferrer">查看原站 ↗</a></footer></div>
             </article>)}
