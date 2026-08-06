@@ -19,8 +19,10 @@ test("exports every FRAME OS route", async () => {
   assert.match(home, /今日视觉主题/);
   assert.match(home, /今日入库/);
   assert.match(home, /LIVE SEARCH READY/);
+  assert.match(home, /WIKIMEDIA COMMONS/);
   assert.match(home, /OPENVERSE/);
   assert.match(home, /联网寻找参考/);
+  assert.match(home, /时尚型 MV/);
   assert.match(home, /混凝土缎带/);
   assert.match(home, /2026-08-06/);
   assert.match(home, /CC BY-SA 4\.0/);

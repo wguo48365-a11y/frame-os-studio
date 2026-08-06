@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { curatedFrames, curationDate } from "../data/curation";
-import { LiveSearchFrame, professionalSearchUrl, professionalSources, searchLiveFrames } from "../lib/liveSearch";
+import { LiveSearchFrame, SearchDirection, professionalSearchUrl, professionalSources, searchLiveFrames } from "../lib/liveSearch";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const url = (path: string) => `${basePath}${path}`;
@@ -57,29 +57,37 @@ function Shell({ active, children }: { active: string; children: React.ReactNode
 
 export function HomeWorkspace() {
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState(["孤独女性", "现代建筑"]);
+  const [selected, setSelected] = useState<string[]>([]);
   const [searchStatus, setSearchStatus] = useState<"idle" | "loading" | "ready" | "error">("idle");
   const [searchResults, setSearchResults] = useState<LiveSearchFrame[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [intentLabel, setIntentLabel] = useState("联网参考");
   const [activeSources, setActiveSources] = useState<string[]>([]);
+  const [searchDirections, setSearchDirections] = useState<SearchDirection[]>([]);
   const [curationFilter, setCurationFilter] = useState("全部");
   const toggle = (tag: string) => setSelected((s) => s.includes(tag) ? s.filter((x) => x !== tag) : [...s, tag]);
   const categories = ["全部", ...Array.from(new Set(dailyFrames.map((frame) => frame.category)))];
   const visibleFrames = curationFilter === "全部" ? dailyFrames : dailyFrames.filter((frame) => frame.category === curationFilter);
-  const runSearch = async () => {
-    if (!query.trim() && !selected.length) return;
+  const runSearch = async (overrideQuery?: string) => {
+    const requestedQuery = typeof overrideQuery === "string" ? overrideQuery : query;
+    if (!requestedQuery.trim() && !selected.length) return;
+    if (typeof overrideQuery === "string") setQuery(overrideQuery);
     setSearchStatus("loading");
     setSearchResults([]);
+    setSearchDirections([]);
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 18000);
     try {
-      const response = await searchLiveFrames(query, selected, controller.signal);
+      const response = await searchLiveFrames(requestedQuery, selected, controller.signal);
       setSearchResults(response.results);
       setSearchTerm(response.translatedQuery);
+      setIntentLabel(response.intentLabel);
       setActiveSources(response.activeSources);
+      setSearchDirections(response.directions);
       setSearchStatus("ready");
     } catch {
-      setSearchTerm(query.trim() || selected.join(" "));
+      setSearchTerm(requestedQuery.trim() || selected.join(" "));
+      setIntentLabel("联网参考");
       setActiveSources([]);
       setSearchStatus("error");
     } finally {
@@ -99,26 +107,33 @@ export function HomeWorkspace() {
           <div className="ai-spark">✦</div>
           <div className="search-content">
             <label htmlFor="creative-search">告诉 FRAME AI 你正在创作什么</label>
-            <textarea id="creative-search" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") runSearch(); }} placeholder="例如：孤独人物置身现代建筑，冷峻、克制、电影感。强调空间秩序，不要广告感……" />
+            <textarea id="creative-search" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") void runSearch(); }} placeholder="例如：时尚型 MV，女性独舞，红色舞台，强轮廓光，克制而有力量……" />
             <div className="search-footer">
               <div className="chips">
-                {["孤独女性", "现代建筑", "冷银色调", "慢推镜头"].map((tag) => <button type="button" key={tag} onClick={() => toggle(tag)} className={selected.includes(tag) ? "selected" : ""}>{tag}</button>)}
+                {["时尚造型", "舞台表演", "叙事电影", "实验影像"].map((tag) => <button type="button" key={tag} onClick={() => toggle(tag)} className={selected.includes(tag) ? "selected" : ""}>{tag}</button>)}
               </div>
-              <button type="button" className="generate-btn" onClick={runSearch} disabled={searchStatus === "loading"}>{searchStatus === "loading" ? "正在检索网络…" : "联网寻找参考"} <span>→</span></button>
+              <button type="button" className="generate-btn" onClick={() => void runSearch()} disabled={searchStatus === "loading"}>{searchStatus === "loading" ? "正在检索网络…" : "联网寻找参考"} <span>→</span></button>
             </div>
           </div>
         </section>
-        <div className="network-source-strip"><span><i /> LIVE SEARCH READY</span><b>OPENVERSE · 800M+ OPEN WORKS</b><b>ART INSTITUTE OF CHICAGO</b><em>Ctrl / ⌘ + Enter</em></div>
+        <div className="network-source-strip"><span><i /> LIVE SEARCH READY</span><b>WIKIMEDIA COMMONS · FILM &amp; MEDIA</b><b>OPENVERSE · OPEN WORKS</b><em>Ctrl / ⌘ + Enter</em></div>
 
         {searchStatus !== "idle" && <section className={`network-results ${searchStatus}`} aria-live="polite" aria-busy={searchStatus === "loading"}>
           <header className="network-results-head">
-            <div><p className="eyebrow gold">NETWORK VISUAL RESEARCH</p><h2>{searchStatus === "loading" ? "正在穿过视觉网络…" : "联网参考"}</h2></div>
+            <div><p className="eyebrow gold">NETWORK VISUAL RESEARCH</p><h2>{searchStatus === "loading" ? "正在穿过视觉网络…" : intentLabel}</h2></div>
             {searchStatus === "ready" && <div className="network-stats"><span>{searchResults.length} RESULTS</span><span>{activeSources.length} LIVE SOURCES</span></div>}
           </header>
           {searchStatus === "loading" && <div className="network-loading"><i /><i /><i /><p>正在跨来源检索、去重并整理出处。</p></div>}
           {searchStatus === "error" && <div className="network-error"><b>实时来源暂时没有响应。</b><span>你仍可使用下方专业站点深度检索；稍后也可以再次点击联网搜索。</span></div>}
           {(searchStatus === "ready" || searchStatus === "error") && <>
             <div className="search-interpretation"><span>FRAME OS 理解的视觉意图</span><b>{searchTerm}</b></div>
+            {searchDirections.length > 0 && <div className="intent-directions">
+              <div><p className="eyebrow">CHOOSE A DIRECTION</p><h3>“MV”范围很大，继续收窄方向</h3><p>下面的结果已按四类 MV 语言检索；选择一个方向可获得更准确的下一轮参考。</p></div>
+              <div>{searchDirections.map((direction) => <button type="button" key={direction.id} onClick={() => void runSearch(direction.query)}>
+                <img src={url(direction.image)} alt="" />
+                <span><b>{direction.title}</b><small>{direction.subtitle}</small></span><i>→</i>
+              </button>)}</div>
+            </div>}
             <div className="professional-searches">
               <div><p className="eyebrow">PROFESSIONAL INDEX</p><h3>专业站点深度检索</h3></div>
               <div>{professionalSources.map((source) => <a key={source.name} href={professionalSearchUrl(source.domain, query, selected)} target="_blank" rel="noreferrer"><span>{source.name}</span><small>{source.type}</small><i>↗</i></a>)}</div>
@@ -128,8 +143,10 @@ export function HomeWorkspace() {
           {searchStatus === "ready" && searchResults.length > 0 && <div className="network-grid">
             {searchResults.map((frame, index) => <article className="network-card" key={frame.id}>
               <a href={frame.sourceUrl} target="_blank" rel="noreferrer" className="network-image">
-                <img src={frame.image} alt={frame.title} loading="lazy" referrerPolicy="no-referrer" />
-                <span>{String(index + 1).padStart(2, "0")}</span><b>{frame.source}</b>
+                <img src={frame.image} alt={frame.title} loading="lazy" referrerPolicy="no-referrer" onError={(event) => { event.currentTarget.hidden = true; event.currentTarget.parentElement?.classList.add("image-unavailable"); }} />
+                <span className="image-fallback">预览暂不可用 · 查看原站</span>
+                <span className="network-index">{String(index + 1).padStart(2, "0")}</span><b>{frame.source}</b>
+                {frame.direction && <em>{frame.direction}</em>}
               </a>
               <div><h3>{frame.title}</h3><p>{frame.creator}</p><footer><a href={frame.licenseUrl} target="_blank" rel="noreferrer">{frame.license}</a><a href={frame.sourceUrl} target="_blank" rel="noreferrer">查看原站 ↗</a></footer></div>
             </article>)}
