@@ -23,10 +23,10 @@ test("exports every FRAME OS route", async () => {
   assert.match(home, /NO AUTO-FILL/);
   assert.match(home, /联网寻找参考/);
   assert.match(home, /时尚型 MV/);
-  assert.match(home, /蓝瓷回廊/);
-  assert.match(home, /2026-08-07/);
+  assert.match(home, /玻璃舟骨/);
+  assert.match(home, /2026-08-10/);
   assert.match(home, /CC BY-SA 4\.0/);
-  assert.doesNotMatch(home, /混凝土缎带/);
+  assert.doesNotMatch(home, /蓝瓷回廊/);
   assert.equal((home.match(/curation-card/g) ?? []).length, 8);
   assert.match(analysis, /静帧分析/);
   assert.match(analysis, /Seedance/);
@@ -77,6 +77,14 @@ test("exports all cinematic assets", async () => {
     "curation/2026-08-07/khumbu-glacier.jpg",
     "curation/2026-08-07/light-trails.jpg",
     "curation/2026-08-07/london-eye.jpg",
+    "curation/2026-08-10/tokyo-forum.jpg",
+    "curation/2026-08-10/stage-led-dancers.jpg",
+    "curation/2026-08-10/window-rays.jpg",
+    "curation/2026-08-10/fog-woods.jpg",
+    "curation/2026-08-10/tavurvur.jpg",
+    "curation/2026-08-10/rust-surface.jpg",
+    "curation/2026-08-10/pastel-motion.jpg",
+    "curation/2026-08-10/keyboard-zoom.jpg",
   ].map((name) => access(new URL(name, root))));
 });
 
