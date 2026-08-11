@@ -7,11 +7,11 @@ const favicon = `${siteUrl.replace(/\/$/, "")}/favicon.svg`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "FRAME OS — 镜库 OS",
-  description: "为 AIGC 导演而生的电影静帧灵感与视觉分析工作台。",
+  title: "FRAME OS — 导演视觉研究引擎",
+  description: "连接电影、MV 与广告作品的专业静帧索引、镜头分析和项目视觉板。",
   icons: { icon: favicon, shortcut: favicon },
-  openGraph: { title: "FRAME OS — 镜库 OS", description: "AIGC 电影静帧灵感与导演工作台", images: [{ url: socialImage }] },
-  twitter: { card: "summary_large_image", title: "FRAME OS — 镜库 OS", description: "AIGC 电影静帧灵感与导演工作台", images: [socialImage] },
+  openGraph: { title: "FRAME OS — 导演视觉研究引擎", description: "电影、MV、广告静帧索引与创作者工作台", images: [{ url: socialImage }] },
+  twitter: { card: "summary_large_image", title: "FRAME OS — 导演视觉研究引擎", description: "电影、MV、广告静帧索引与创作者工作台", images: [socialImage] },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

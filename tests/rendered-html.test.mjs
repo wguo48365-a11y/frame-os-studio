@@ -8,102 +8,59 @@ async function page(path) {
   return readFile(new URL(path, root), "utf8");
 }
 
-test("exports every FRAME OS route", async () => {
+test("exports the rebuilt director research workflow", async () => {
   const [home, analysis, moodboard] = await Promise.all([
     page("index.html"),
     page("analysis/index.html"),
     page("moodboard/index.html"),
   ]);
 
-  assert.match(home, /FRAME OS/);
-  assert.match(home, /今日视觉主题/);
-  assert.match(home, /今日入库/);
-  assert.match(home, /QUALITY GATE ACTIVE/);
-  assert.match(home, /VIMEO STAFF PICKS/);
-  assert.match(home, /NO AUTO-FILL/);
-  assert.match(home, /联网寻找参考/);
-  assert.match(home, /时尚型 MV/);
-  assert.match(home, /冰下深蓝/);
-  assert.match(home, /2026-08-11/);
-  assert.match(home, /CC BY-SA 4\.0/);
-  assert.doesNotMatch(home, /玻璃舟骨/);
-  assert.equal((home.match(/curation-card/g) ?? []).length, 8);
-  assert.match(analysis, /静帧分析/);
+  assert.match(home, /找到能解决镜头问题的参考/);
+  assert.match(home, /电影 \/ MV \/ 广告/);
+  assert.match(home, /Fallen Angels/);
+  assert.match(home, /The Handmaiden/);
+  assert.match(home, /Camera — Charli xcx/);
+  assert.match(home, /Everything Disappears — ASICS/);
+  assert.match(home, /SOURCE NETWORK/);
+  assert.match(home, /ShotDeck/);
+  assert.match(home, /Directors(?:'|&#x27;) Library/);
+  assert.doesNotMatch(home, /今日入库|Wikimedia|Openverse|QUALITY GATE ACTIVE/);
+  assert.equal((home.match(/work-card/g) ?? []).length, 12);
+
+  assert.match(analysis, /FRAME READING/);
+  assert.match(analysis, /它为什么值得参考/);
   assert.match(analysis, /Seedance/);
-  assert.match(moodboard, /静默建筑/);
+  assert.match(moodboard, /午夜仪式/);
   assert.match(moodboard, /DIRECTOR(?:'|&#x27;)S NOTE/);
   assert.doesNotMatch(home + analysis + moodboard, /chatgpt\.site/);
 });
 
-test("exports all cinematic assets", async () => {
+test("exports every professional reference image", async () => {
   await Promise.all([
-    "frame-hall.png",
-    "frame-window.png",
-    "frame-concrete.png",
-    "frame-stage.png",
-    "frame-texture.png",
     "og.png",
-    "professional/mv/beside-april.jpg",
-    "professional/mv/xena.jpg",
-    "professional/mv/ocha.jpg",
-    "professional/mv/territory.jpg",
-    "professional/mv/arcadian.jpg",
-    "professional/mv/mira-mira.jpg",
-    "professional/mv/another-night-out.jpg",
-    "professional/mv/growing-young.jpg",
-    "professional/mv/nobody-speak.jpg",
-    "professional/mv/tailor-swif.jpg",
-    "curation/2026-08-05/brutalist-horizon.jpg",
-    "curation/2026-08-05/window-contrast.jpg",
-    "curation/2026-08-05/blue-stage.jpg",
-    "curation/2026-08-05/shadow-rehearsal.jpg",
-    "curation/2026-08-05/fog-axis.jpg",
-    "curation/2026-08-05/golden-ditch.jpg",
-    "curation/2026-08-05/fluted-color.jpg",
-    "curation/2026-08-05/white-ribbon.jpg",
-    "curation/2026-08-06/concrete-ribbon.jpg",
-    "curation/2026-08-06/perseid-mirror.jpg",
-    "curation/2026-08-06/needle-eye.jpg",
-    "curation/2026-08-06/arid-delta.jpg",
-    "curation/2026-08-06/machine-dials.jpg",
-    "curation/2026-08-06/street-void.jpg",
-    "curation/2026-08-06/slate-copper.jpg",
-    "curation/2026-08-06/spike-shadow.jpg",
-    "curation/2026-08-07/esplanade-stairwell.jpg",
-    "curation/2026-08-07/praying-profile.jpg",
-    "curation/2026-08-07/green-stage.jpg",
-    "curation/2026-08-07/receding-fog.jpg",
-    "curation/2026-08-07/ice-structure.jpg",
-    "curation/2026-08-07/khumbu-glacier.jpg",
-    "curation/2026-08-07/light-trails.jpg",
-    "curation/2026-08-07/london-eye.jpg",
-    "curation/2026-08-10/tokyo-forum.jpg",
-    "curation/2026-08-10/stage-led-dancers.jpg",
-    "curation/2026-08-10/window-rays.jpg",
-    "curation/2026-08-10/fog-woods.jpg",
-    "curation/2026-08-10/tavurvur.jpg",
-    "curation/2026-08-10/rust-surface.jpg",
-    "curation/2026-08-10/pastel-motion.jpg",
-    "curation/2026-08-10/keyboard-zoom.jpg",
-    "curation/2026-08-11/underwater-ice.jpg",
-    "curation/2026-08-11/fingerprint-cowry.jpg",
-    "curation/2026-08-11/isaac-storm.jpg",
-    "curation/2026-08-11/kimono-forest.jpg",
-    "curation/2026-08-11/tightrope-girl.jpg",
-    "curation/2026-08-11/window-portrait-above.jpg",
-    "curation/2026-08-11/prague-lights.jpg",
-    "curation/2026-08-11/hermes-facade.jpg",
+    "professional/reframe/film-fallen-angels.jpg",
+    "professional/reframe/film-neon-demon.jpg",
+    "professional/reframe/film-handmaiden.jpg",
+    "professional/reframe/film-dune.jpg",
+    "professional/reframe/mv-camera.jpg",
+    "professional/reframe/mv-i-wait.jpg",
+    "professional/reframe/mv-seeing-signs.jpg",
+    "professional/reframe/mv-happy-hour.jpg",
+    "professional/reframe/ad-asics.jpg",
+    "professional/reframe/ad-maybach.jpg",
+    "professional/reframe/ad-bystander.jpg",
+    "professional/reframe/ad-adidas.jpg",
   ].map((name) => access(new URL(name, root))));
 });
 
-test("uses the professional quality index instead of open archive auto-fill", async () => {
-  const [works, search] = await Promise.all([
-    readFile(new URL("../app/data/professionalWorks.ts", import.meta.url), "utf8"),
-    readFile(new URL("../app/lib/liveSearch.ts", import.meta.url), "utf8"),
-  ]);
+test("professional index keeps credits, sources, and craft notes", async () => {
+  const works = await readFile(new URL("../app/data/professionalWorks.ts", import.meta.url), "utf8");
 
-  assert.equal((works.match(/id: "vimeo-/g) ?? []).length, 10);
-  assert.match(works, /VIMEO STAFF PICK/);
-  assert.match(search, /乐队/);
-  assert.doesNotMatch(search, /api\.openverse\.org|api\.artic\.edu|commons\.wikimedia\.org\/w\/api/);
+  assert.equal((works.match(/id: "(?:film|mv|ad)-/g) ?? []).length, 12);
+  assert.equal((works.match(/\n    sourceUrl:/g) ?? []).length, 12);
+  assert.equal((works.match(/\n    why:/g) ?? []).length, 12);
+  assert.match(works, /FILMGRAB/);
+  assert.match(works, /DIRECTORS' LIBRARY/);
+  assert.match(works, /cinematography/);
+  assert.doesNotMatch(works, /Wikimedia|Openverse/);
 });
