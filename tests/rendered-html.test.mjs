@@ -22,6 +22,8 @@ test("exports the rebuilt director research workflow", async () => {
   assert.match(home, /Camera — Charli xcx/);
   assert.match(home, /Everything Disappears — ASICS/);
   assert.match(home, /SOURCE NETWORK/);
+  assert.match(home, /LIVE PROFESSIONAL NETWORK/);
+  assert.match(home, /联网寻找参考/);
   assert.match(home, /ShotDeck/);
   assert.match(home, /Directors(?:'|&#x27;) Library/);
   assert.doesNotMatch(home, /今日入库|Wikimedia|Openverse|QUALITY GATE ACTIVE/);
@@ -33,6 +35,22 @@ test("exports the rebuilt director research workflow", async () => {
   assert.match(moodboard, /午夜仪式/);
   assert.match(moodboard, /DIRECTOR(?:'|&#x27;)S NOTE/);
   assert.doesNotMatch(home + analysis + moodboard, /chatgpt\.site/);
+});
+
+test("live search connects a professional source and translates Chinese visual intent", async () => {
+  const [networkSearch, workspace] = await Promise.all([
+    readFile(new URL("../app/lib/networkSearch.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/components/FrameOS.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(workspace, /实时联网结果/);
+  assert.match(networkSearch, /directorslibrary\.com\/wp-json\/wp\/v2\/video/);
+  assert.match(networkSearch, /科幻\|太空\|宇宙/);
+  assert.match(networkSearch, /science fiction/);
+  assert.match(networkSearch, /music video/);
+  assert.match(networkSearch, /campaign/);
+  assert.match(networkSearch, /Promise\.allSettled/);
+  assert.match(networkSearch, /AbortSignal/);
 });
 
 test("exports every professional reference image", async () => {

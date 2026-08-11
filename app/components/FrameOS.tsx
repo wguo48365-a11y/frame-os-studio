@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { professionalSources, professionalWorks, ReferenceKind } from "../data/professionalWorks";
+import { NetworkResult, searchProfessionalNetwork } from "../lib/networkSearch";
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const asset = (path: string) => `${basePath}${path}`;
@@ -69,6 +70,9 @@ function expandQuery(value: string) {
   if (/mv|音乐|歌手|乐队|舞台/.test(query)) additions.push("mv 表演 舞台 人物");
   if (/广告|品牌|商业/.test(query)) additions.push("广告 高级 时尚");
   if (/电影|叙事/.test(query)) additions.push("电影 叙事 电影感");
+  if (/科幻|未来世界|太空|宇宙|星际/.test(query)) additions.push("未来主义 灰蓝 负空间 人物尺度 科幻");
+  if (/赛博|霓虹都市/.test(query)) additions.push("霓虹 香港夜色 未来主义");
+  if (/舞蹈|独舞|群舞/.test(query)) additions.push("表演 舞台 人物 动作层次");
   if (/孤独|疏离|冷峻/.test(query)) additions.push("负空间 疏离 冷静 人物尺度");
   if (/高级|奢华/.test(query)) additions.push("时尚 奢华 极简 冷白");
   if (/红|暖/.test(query)) additions.push("暖红 琥珀 红黑 烛光");
@@ -111,10 +115,34 @@ function WorkCard({ work, index }: { work: (typeof professionalWorks)[number]; i
   );
 }
 
+function NetworkWorkCard({ work, index }: { work: NetworkResult; index: number }) {
+  return (
+    <article className="work-card network-work-card">
+      <a className="work-image" href={work.sourceUrl} target="_blank" rel="noreferrer">
+        <img src={work.image} alt={`${work.title} 在线作品预览`} loading="lazy" referrerPolicy="no-referrer" />
+        <span className={`kind kind-${work.kind.toLowerCase()}`}>{work.kind}</span>
+        <span className="work-index">LIVE {String(index + 1).padStart(2, "0")}</span>
+        <span className="analyze-cta">打开原作品与制作名单 ↗</span>
+      </a>
+      <div className="work-copy">
+        <div className="work-title-row"><div><h3>{work.title}</h3><p>来自实时专业作品检索</p></div><b>{work.year}</b></div>
+        <p className="work-credit">匹配视觉概念 · {work.matchedTerm}</p>
+        <div className="work-tags"><span>实时联网</span><span>{work.kind}</span><span>专业来源</span></div>
+        <p className="work-why">{work.description}</p>
+        <footer><span>{work.source}</span><a href={work.sourceUrl} target="_blank" rel="noreferrer">查看原作品 ↗</a></footer>
+      </div>
+    </article>
+  );
+}
+
 export function HomeWorkspace() {
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<"全部" | ReferenceKind>("全部");
   const [searched, setSearched] = useState(false);
+  const [networkResults, setNetworkResults] = useState<NetworkResult[]>([]);
+  const [networkStatus, setNetworkStatus] = useState<"idle" | "searching" | "ready" | "error">("idle");
+  const [networkTerms, setNetworkTerms] = useState<string[]>([]);
+  const searchRequest = useRef<AbortController | null>(null);
 
   const results = useMemo(() => {
     const requestedKind = kind === "全部" ? inferKind(query) : kind;
@@ -125,12 +153,43 @@ export function HomeWorkspace() {
       .map(({ work }) => work);
   }, [kind, query, searched]);
 
-  const runSearch = () => setSearched(true);
-  const applyExample = (label: string, nextKind: ReferenceKind) => {
-    setQuery(label);
+  const visibleNetworkResults = useMemo(() => {
+    const localTitles = new Set(results.map((work) => work.title.toLocaleLowerCase()));
+    return networkResults.filter((work) => !localTitles.has(work.title.toLocaleLowerCase()));
+  }, [networkResults, results]);
+
+  useEffect(() => () => searchRequest.current?.abort(), []);
+
+  const executeSearch = async (nextQuery: string, nextKind: "全部" | ReferenceKind) => {
+    setQuery(nextQuery);
     setKind(nextKind);
     setSearched(true);
+    setNetworkResults([]);
+    setNetworkTerms([]);
+    searchRequest.current?.abort();
+
+    const requestedKind = nextKind === "全部" ? inferKind(nextQuery) : nextKind;
+    const controller = new AbortController();
+    searchRequest.current = controller;
+    setNetworkStatus("searching");
+    const timeout = window.setTimeout(() => controller.abort(), 16000);
+
+    try {
+      const live = await searchProfessionalNetwork(nextQuery, requestedKind, controller.signal);
+      if (controller.signal.aborted) return;
+      setNetworkResults(live.results);
+      setNetworkTerms(live.terms);
+      setNetworkStatus("ready");
+    } catch {
+      if (searchRequest.current === controller) setNetworkStatus("error");
+    } finally {
+      window.clearTimeout(timeout);
+    }
   };
+  const runSearch = () => void executeSearch(query, kind);
+  const applyExample = (label: string, nextKind: ReferenceKind) => void executeSearch(label, nextKind);
+  const totalResults = results.length + visibleNetworkResults.length;
+  const fallbackTerm = networkTerms[0] || query || (kind === "全部" ? "cinematography" : kind);
 
   return (
     <Shell active="/">
@@ -142,14 +201,14 @@ export function HomeWorkspace() {
         </section>
 
         <section className="research-console" aria-label="视觉参考检索">
-          <div className="console-head"><span>01 · CREATIVE INTENT</span><b>{professionalWorks.length} EDITORIAL REFERENCES</b></div>
+          <div className="console-head"><span>01 · CREATIVE INTENT</span><b>LIVE PROFESSIONAL NETWORK</b></div>
           <label htmlFor="research-query">描述你正在寻找的画面</label>
           <textarea id="research-query" value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") runSearch(); }} placeholder="例如：女歌手站在红色舞台中央，极简、强轮廓光、克制但有力量……" />
           <div className="console-controls">
             <div className="kind-filter" aria-label="作品类型">
               {(["全部", "电影", "MV", "广告"] as const).map((item) => <button key={item} className={kind === item ? "active" : ""} onClick={() => setKind(item)}>{item}</button>)}
             </div>
-            <button className="primary-action" onClick={runSearch}>检索专业索引 <span>→</span></button>
+            <button className="primary-action" onClick={runSearch} disabled={networkStatus === "searching"}>{networkStatus === "searching" ? "正在联网检索…" : "联网寻找参考"} <span>→</span></button>
           </div>
           <div className="examples"><span>试试：</span>{examples.map((example) => <button key={example.label} onClick={() => applyExample(example.label, example.kind)}>{example.label}</button>)}</div>
         </section>
@@ -157,10 +216,18 @@ export function HomeWorkspace() {
         <section className="results-section" aria-live="polite">
           <header className="section-title">
             <div><p className="eyebrow gold">{searched ? "SEARCH RESULTS" : "EDITOR'S SELECTION"}</p><h2>{searched ? `为“${query || kind}”找到的参考` : "先看真正值得研究的画面"}</h2></div>
-            <p><b>{results.length}</b> 个作品样本<br />电影 / MV / 广告</p>
+            <p><b>{totalResults}</b> 个作品样本<br />站内策展 + 实时联网</p>
           </header>
-          {results.length ? <div className="work-grid">{results.map((work, index) => <WorkCard key={work.id} work={work} index={index} />)}</div> : (
-            <div className="empty-state"><b>当前专业索引里没有足够准确的结果。</b><p>FRAME OS 不会用普通摄影图补位。请换一个更具体的描述，或从下方专业来源继续查找。</p></div>
+          {searched && <div className={`network-status network-${networkStatus}`}><i /><div><b>{networkStatus === "searching" ? "正在连接专业作品库" : networkStatus === "ready" ? "实时检索完成" : networkStatus === "error" ? "专业来源本次连接超时" : "准备联网"}</b><p>{networkStatus === "searching" ? "正在把中文创作意图转换为专业检索语言…" : networkStatus === "ready" ? `已查询 Directors’ Library${networkTerms.length ? ` · ${networkTerms.join(" / ")}` : ""}` : networkStatus === "error" ? "仍会保留站内结果和原站深度搜索入口。" : ""}</p></div></div>}
+
+          {results.length > 0 && <div className="result-group"><div className="result-label"><span>01</span><b>站内人工精选</b><p>可直接进入 FRAME OS 静帧分析</p></div><div className="work-grid">{results.map((work, index) => <WorkCard key={work.id} work={work} index={index} />)}</div></div>}
+
+          {visibleNetworkResults.length > 0 && <div className="result-group network-group"><div className="result-label"><span>02</span><b>实时联网结果</b><p>来自 Directors’ Library，点击进入原作品</p></div><div className="work-grid">{visibleNetworkResults.map((work, index) => <NetworkWorkCard key={work.id} work={work} index={index} />)}</div></div>}
+
+          {searched && networkStatus === "searching" && results.length === 0 && <div className="searching-state"><i /><b>正在外部专业作品库中寻找画面…</b></div>}
+
+          {searched && networkStatus !== "searching" && totalResults === 0 && (
+            <div className="empty-state"><b>这次没有找到足够准确的专业结果。</b><p>搜索已经真实连接外部来源，但专业站点可能没有对应关键词，或当前网络暂时不可用。可以直接继续深度检索：</p><div className="deep-search-links"><a href={`https://directorslibrary.com/?s=${encodeURIComponent(fallbackTerm)}`} target="_blank" rel="noreferrer">Directors’ Library ↗</a><a href={`https://film-grab.com/?s=${encodeURIComponent(fallbackTerm)}`} target="_blank" rel="noreferrer">FilmGrab ↗</a><a href={`https://vimeo.com/search?q=${encodeURIComponent(fallbackTerm)}`} target="_blank" rel="noreferrer">Vimeo ↗</a></div></div>
           )}
         </section>
 
