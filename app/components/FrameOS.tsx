@@ -35,7 +35,7 @@ function Shell({ active, children }: { active: string; children: React.ReactNode
           <dl>
             <div><dt>精选作品</dt><dd>{professionalWorks.length}</dd></div>
             <div><dt>来源网络</dt><dd>{professionalSources.length}</dd></div>
-            <div><dt>内容类型</dt><dd>电影 / MV / 广告</dd></div>
+            <div><dt>内容类型</dt><dd>电影 / MV / 广告 / 短片</dd></div>
           </dl>
         </div>
         <div className="profile"><span>K</span><div><b>KEN&apos;S PRIVATE DESK</b><small>RESEARCH, NOT A GALLERY</small></div></div>
@@ -70,6 +70,7 @@ function expandQuery(value: string) {
   if (/mv|音乐|歌手|乐队|舞台/.test(query)) additions.push("mv 表演 舞台 人物");
   if (/广告|品牌|商业/.test(query)) additions.push("广告 高级 时尚");
   if (/电影|叙事/.test(query)) additions.push("电影 叙事 电影感");
+  if (/短片|创意短片|纪录短片/.test(query)) additions.push("短片 叙事 实验 纪录");
   if (/科幻|未来世界|太空|宇宙|星际/.test(query)) additions.push("未来主义 灰蓝 负空间 人物尺度 科幻");
   if (/赛博|霓虹都市/.test(query)) additions.push("霓虹 香港夜色 未来主义");
   if (/舞蹈|独舞|群舞/.test(query)) additions.push("表演 舞台 人物 动作层次");
@@ -89,6 +90,7 @@ function scoreWork(work: (typeof professionalWorks)[number], query: string) {
 }
 
 function inferKind(query: string): ReferenceKind | null {
+  if (/短片|创意短片|纪录短片/.test(query)) return "短片";
   if (/\bmv\b|音乐|歌手|乐队|舞台/.test(query.toLocaleLowerCase())) return "MV";
   if (/广告|品牌|商业/.test(query)) return "广告";
   if (/电影|叙事片|长片/.test(query)) return "电影";
@@ -197,7 +199,7 @@ export function HomeWorkspace() {
         <section className="home-intro">
           <p className="eyebrow gold">FRAME OS · REBUILT AS A RESEARCH ENGINE</p>
           <h1>别再搜“好看的图”。<br /><em>找到能解决镜头问题的参考。</em></h1>
-          <p>面向导演、摄影、美术与 AIGC 创作者的专业视觉索引。内容来自电影、MV 与广告作品，并保留导演、摄影、出处和镜头价值。</p>
+          <p>面向导演、摄影、美术与 AIGC 创作者的专业视觉索引。内容来自电影、MV、广告与创意短片，并保留导演、摄影、出处和镜头价值。</p>
         </section>
 
         <section className="research-console" aria-label="视觉参考检索">
@@ -206,7 +208,7 @@ export function HomeWorkspace() {
           <textarea id="research-query" value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") runSearch(); }} placeholder="例如：女歌手站在红色舞台中央，极简、强轮廓光、克制但有力量……" />
           <div className="console-controls">
             <div className="kind-filter" aria-label="作品类型">
-              {(["全部", "电影", "MV", "广告"] as const).map((item) => <button key={item} className={kind === item ? "active" : ""} onClick={() => setKind(item)}>{item}</button>)}
+              {(["全部", "电影", "MV", "广告", "短片"] as const).map((item) => <button key={item} className={kind === item ? "active" : ""} onClick={() => setKind(item)}>{item}</button>)}
             </div>
             <button className="primary-action" onClick={runSearch} disabled={networkStatus === "searching"}>{networkStatus === "searching" ? "正在联网检索…" : "联网寻找参考"} <span>→</span></button>
           </div>

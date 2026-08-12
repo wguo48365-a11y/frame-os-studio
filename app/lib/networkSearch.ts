@@ -63,6 +63,7 @@ const kindDefaults: Record<ReferenceKind, string> = {
   电影: "cinema",
   MV: "music video",
   广告: "campaign",
+  短片: "short film",
 };
 
 function decodeText(value = "") {
@@ -88,6 +89,7 @@ function detectKind(video: DirectorsLibraryVideo): ReferenceKind | null {
   const path = `${video.link ?? ""} ${(video.class_list ?? []).join(" ")}`.toLowerCase();
   if (/music-videos?|category-music/.test(path)) return "MV";
   if (/campaigns?|commercials?|category-campaign/.test(path)) return "广告";
+  if (/\/shorts?\/|short-films?|category-(?:creative|narrative|documentary)-short/.test(path)) return "短片";
   if (/film-tv|movies?|short-films?|category-movies?|category-tv/.test(path)) return "电影";
   return null;
 }

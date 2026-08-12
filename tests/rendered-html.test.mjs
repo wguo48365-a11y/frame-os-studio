@@ -16,7 +16,9 @@ test("exports the rebuilt director research workflow", async () => {
   ]);
 
   assert.match(home, /找到能解决镜头问题的参考/);
-  assert.match(home, /电影 \/ MV \/ 广告/);
+  assert.match(home, /电影 \/ MV \/ 广告 \/ 短片/);
+  assert.match(home, /The Calm &amp; The Chaos/);
+  assert.match(home, /We Beg To Differ/);
   assert.match(home, /Fallen Angels/);
   assert.match(home, /The Handmaiden/);
   assert.match(home, /Camera — Charli xcx/);
@@ -27,7 +29,7 @@ test("exports the rebuilt director research workflow", async () => {
   assert.match(home, /ShotDeck/);
   assert.match(home, /Directors(?:'|&#x27;) Library/);
   assert.doesNotMatch(home, /今日入库|Wikimedia|Openverse|QUALITY GATE ACTIVE/);
-  assert.equal((home.match(/work-card/g) ?? []).length, 12);
+  assert.equal((home.match(/work-card/g) ?? []).length, 19);
 
   assert.match(analysis, /FRAME READING/);
   assert.match(analysis, /它为什么值得参考/);
@@ -49,6 +51,8 @@ test("live search connects a professional source and translates Chinese visual i
   assert.match(networkSearch, /science fiction/);
   assert.match(networkSearch, /music video/);
   assert.match(networkSearch, /campaign/);
+  assert.match(networkSearch, /short film/);
+  assert.match(workspace, /"短片"/);
   assert.match(networkSearch, /Promise\.allSettled/);
   assert.match(networkSearch, /AbortSignal/);
 });
@@ -68,15 +72,22 @@ test("exports every professional reference image", async () => {
     "professional/reframe/ad-maybach.jpg",
     "professional/reframe/ad-bystander.jpg",
     "professional/reframe/ad-adidas.jpg",
+    "professional/2026-08-12/stone-island-calm-chaos.jpg",
+    "professional/2026-08-12/we-beg-to-differ.jpg",
+    "professional/2026-08-12/wishes-are-medicine.jpg",
+    "professional/2026-08-12/the-return.jpg",
+    "professional/2026-08-12/heads-of-cerberus.jpg",
+    "professional/2026-08-12/ground-beneath-our-feet.jpg",
+    "professional/2026-08-12/mariinka.jpg",
   ].map((name) => access(new URL(name, root))));
 });
 
 test("professional index keeps credits, sources, and craft notes", async () => {
   const works = await readFile(new URL("../app/data/professionalWorks.ts", import.meta.url), "utf8");
 
-  assert.equal((works.match(/id: "(?:film|mv|ad)-/g) ?? []).length, 12);
-  assert.equal((works.match(/\n    sourceUrl:/g) ?? []).length, 12);
-  assert.equal((works.match(/\n    why:/g) ?? []).length, 12);
+  assert.equal((works.match(/id: "(?:film|mv|ad|short)-/g) ?? []).length, 19);
+  assert.equal((works.match(/\n    sourceUrl:/g) ?? []).length, 19);
+  assert.equal((works.match(/\n    why:/g) ?? []).length, 19);
   assert.match(works, /FILMGRAB/);
   assert.match(works, /DIRECTORS' LIBRARY/);
   assert.match(works, /cinematography/);
