@@ -19,6 +19,8 @@ test("exports the rebuilt director research workflow", async () => {
   assert.match(home, /电影 \/ MV \/ 广告 \/ 短片/);
   assert.match(home, /The Calm &amp; The Chaos/);
   assert.match(home, /We Beg To Differ/);
+  assert.match(home, /Now You Saw Me/);
+  assert.match(home, /Paradise Rains/);
   assert.match(home, /Fallen Angels/);
   assert.match(home, /The Handmaiden/);
   assert.match(home, /Camera — Charli xcx/);
@@ -29,7 +31,7 @@ test("exports the rebuilt director research workflow", async () => {
   assert.match(home, /ShotDeck/);
   assert.match(home, /Directors(?:'|&#x27;) Library/);
   assert.doesNotMatch(home, /今日入库|Wikimedia|Openverse|QUALITY GATE ACTIVE/);
-  assert.equal((home.match(/work-card/g) ?? []).length, 19);
+  assert.equal((home.match(/work-card/g) ?? []).length, 27);
 
   assert.match(analysis, /FRAME READING/);
   assert.match(analysis, /它为什么值得参考/);
@@ -79,15 +81,23 @@ test("exports every professional reference image", async () => {
     "professional/2026-08-12/heads-of-cerberus.jpg",
     "professional/2026-08-12/ground-beneath-our-feet.jpg",
     "professional/2026-08-12/mariinka.jpg",
+    "professional/2026-08-13/now-you-saw-me.jpg",
+    "professional/2026-08-13/derby.png",
+    "professional/2026-08-13/lost-boys.jpg",
+    "professional/2026-08-13/paradise-rains.jpg",
+    "professional/2026-08-13/international-klein-blue.jpg",
+    "professional/2026-08-13/amazomania.jpg",
+    "professional/2026-08-13/this-is-african-time.jpg",
+    "professional/2026-08-13/jaripeo.jpg",
   ].map((name) => access(new URL(name, root))));
 });
 
 test("professional index keeps credits, sources, and craft notes", async () => {
   const works = await readFile(new URL("../app/data/professionalWorks.ts", import.meta.url), "utf8");
 
-  assert.equal((works.match(/id: "(?:film|mv|ad|short)-/g) ?? []).length, 19);
-  assert.equal((works.match(/\n    sourceUrl:/g) ?? []).length, 19);
-  assert.equal((works.match(/\n    why:/g) ?? []).length, 19);
+  assert.equal((works.match(/id: "(?:film|mv|ad|short)-/g) ?? []).length, 27);
+  assert.equal((works.match(/\n    sourceUrl:/g) ?? []).length, 27);
+  assert.equal((works.match(/\n    why:/g) ?? []).length, 27);
   assert.match(works, /FILMGRAB/);
   assert.match(works, /DIRECTORS' LIBRARY/);
   assert.match(works, /cinematography/);
