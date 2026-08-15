@@ -27,6 +27,11 @@ test("exports the rebuilt director research workflow", async () => {
   assert.match(home, /In the Mood for Love/);
   assert.match(home, /The Fall/);
   assert.match(home, /Suspiria/);
+  assert.match(home, /Trapped/);
+  assert.match(home, /Life Within/);
+  assert.match(home, /Drop Dead/);
+  assert.match(home, /Heart of the Valley/);
+  assert.match(home, /The Assassination of Jesse James/);
   assert.match(home, /Camera — Charli xcx/);
   assert.match(home, /Everything Disappears — ASICS/);
   assert.match(home, /SOURCE NETWORK/);
@@ -35,7 +40,7 @@ test("exports the rebuilt director research workflow", async () => {
   assert.match(home, /ShotDeck/);
   assert.match(home, /Directors(?:'|&#x27;) Library/);
   assert.doesNotMatch(home, /今日入库|Wikimedia|Openverse|QUALITY GATE ACTIVE/);
-  assert.equal((home.match(/work-card/g) ?? []).length, 31);
+  assert.equal((home.match(/work-card/g) ?? []).length, 36);
 
   assert.match(analysis, /FRAME READING/);
   assert.match(analysis, /它为什么值得参考/);
@@ -82,6 +87,11 @@ test("exports every professional reference image", async () => {
     "professional/2026-08-14/in-the-mood-for-love-mirror.jpg",
     "professional/2026-08-14/the-fall-banner.jpg",
     "professional/2026-08-14/suspiria-dance.jpg",
+    "professional/2026-08-15/trapped-gym.webp",
+    "professional/2026-08-15/life-within-rimowa.jpg",
+    "professional/2026-08-15/drop-dead-olivia-rodrigo.webp",
+    "professional/2026-08-15/heart-of-the-valley.jpg",
+    "professional/2026-08-15/jesse-james-lens.jpg",
     "professional/2026-08-12/stone-island-calm-chaos.jpg",
     "professional/2026-08-12/we-beg-to-differ.jpg",
     "professional/2026-08-12/wishes-are-medicine.jpg",
@@ -103,9 +113,9 @@ test("exports every professional reference image", async () => {
 test("professional index keeps credits, sources, and craft notes", async () => {
   const works = await readFile(new URL("../app/data/professionalWorks.ts", import.meta.url), "utf8");
 
-  assert.equal((works.match(/id: "(?:film|mv|ad|short)-/g) ?? []).length, 31);
-  assert.equal((works.match(/\n    sourceUrl:/g) ?? []).length, 31);
-  assert.equal((works.match(/\n    why:/g) ?? []).length, 31);
+  assert.equal((works.match(/id: "(?:film|mv|ad|short)-/g) ?? []).length, 36);
+  assert.equal((works.match(/\n    sourceUrl:/g) ?? []).length, 36);
+  assert.equal((works.match(/\n    why:/g) ?? []).length, 36);
   assert.match(works, /FILMGRAB/);
   assert.match(works, /DIRECTORS' LIBRARY/);
   assert.match(works, /cinematography/);
